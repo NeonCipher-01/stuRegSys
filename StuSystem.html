@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .form-step {
+            display: none;
+        }
+        .form-step.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+        .btn-next {
+            background: #2ecc71;
+        }
+        .btn-next:hover {
+            background: #27ae60;
+        }
+        .btn-prev {
+            background: #e74c3c;
+        }
+        .btn-prev:hover {
+            background: #c0392b;
+        }
+        .progress-bar {
+            display: flex;
+            margin-bottom: 30px;
+        }
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+        .progress-step:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #bdc3c7;
+            z-index: -1;
+        }
+        .progress-step:first-child:before {
+            border-top-left-radius: 2px;
+            border-bottom-left-radius: 2px;
+        }
+        .progress-step:last-child:before {
+            border-top-right-radius: 2px;
+            border-bottom-right-radius: 2px;
+        }
+        .progress-step.active {
+            color: #3498db;
+        }
+        .progress-step.completed {
+            color: #2ecc71;
+        }
+        .progress-step.active:before, .progress-step.completed:before {
+            background: #3498db;
+        }
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        input.invalid, select.invalid {
+            border-color: #e74c3c;
+        }
+        .required:after {
+            content: " *";
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Registration System</h1>
+        
+        <div class="progress-bar">
+            <div class="progress-step active" id="step1-indicator">Personal Info</div>
+            <div class="progress-step" id="step2-indicator">Academic Info</div>
+            <div class="progress-step" id="step3-indicator">Program Choice</div>
+        </div>
+        
+        <form id="registrationForm">
+            <!-- Step 1: Personal Information -->
+            <div class="form-step active" id="step1">
+                <div class="form-group">
+                    <label for="firstName" class="required">First Name</label>
+                    <input type="text" id="firstName" name="firstName" pattern="[A-Za-z ]+" required>
+                    <div class="error" id="firstName-error">Please enter a valid first name (letters only)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="lastName" class="required">Last Name</label>
+                    <input type="text" id="lastName" name="lastName" pattern="[A-Za-z ]+" required>
+                    <div class="error" id="lastName-error">Please enter a valid last name (letters only)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fatherName" class="required">Father's Name</label>
+                    <input type="text" id="fatherName" name="fatherName" pattern="[A-Za-z ]+" required>
+                    <div class="error" id="fatherName-error">Please enter a valid father's name (letters only)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cnic" class="required">CNIC (without dashes)</label>
+                    <input type="text" id="cnic" name="cnic" pattern="[0-9]{13}" placeholder="1234512345671" required>
+                    <div class="error" id="cnic-error">Please enter a valid 13-digit CNIC (numbers only)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dob" class="required">Date of Birth</label>
+                    <input type="date" id="dob" name="dob" required>
+                    <div class="error" id="dob-error">Please select a valid date of birth</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="gender" class="required">Gender</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <div class="error" id="gender-error">Please select your gender</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" class="required">Email</label>
+                    <input type="email" id="email" name="email" required>
+                    <div class="error" id="email-error">Please enter a valid email address</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone" class="required">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" pattern="[0-9]{11}" placeholder="03001234567" required>
+                    <div class="error" id="phone-error">Please enter a valid 11-digit phone number</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address" class="required">Address</label>
+                    <input type="text" id="address" name="address" required>
+                    <div class="error" id="address-error">Please enter your address</div>
+                </div>
+                
+                <div class="btn-container">
+                    <button type="button" class="btn" disabled>Previous</button>
+                    <button type="button" class="btn btn-next" id="next1">Next</button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Academic Information -->
+            <div class="form-step" id="step2">
+                <div class="form-group">
+                    <label for="sscYear" class="required">SSC Year</label>
+                    <select id="sscYear" name="sscYear" required>
+                        <option value="">Select Year</option>
+                        <!-- Years will be populated by JavaScript -->
+                    </select>
+                    <div class="error" id="sscYear-error">Please select SSC year</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sscMarks" class="required">SSC Marks (out of 1050)</label>
+                    <input type="number" id="sscMarks" name="sscMarks" min="0" max="1050" step="1" required>
+                    <div class="error" id="sscMarks-error">Please enter valid SSC marks (0-1050)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sscBoard" class="required">SSC Board</label>
+                    <select id="sscBoard" name="sscBoard" required>
+                        <option value="">Select Board</option>
+                        <option value="fbise">FBISE</option>
+                        <option value="bbise">BBISE</option>
+                        <option value="lbise">LBISE</option>
+                        <option value="kbise">KBISE</option>
+                        <option value="pbise">PBISE</option>
+                        <option value="sbise">SBISE</option>
+                        <option value="abise">ABISE</option>
+                        <option value="gbise">GBISE</option>
+                    </select>
+                    <div class="error" id="sscBoard-error">Please select SSC board</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fscYear" class="required">FSC/HSSC Year</label>
+                    <select id="fscYear" name="fscYear" required>
+                        <option value="">Select Year</option>
+                        <!-- Years will be populated by JavaScript -->
+                    </select>
+                    <div class="error" id="fscYear-error">Please select FSC/HSSC year</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fscMarks" class="required">FSC/HSSC Marks (out of 1100)</label>
+                    <input type="number" id="fscMarks" name="fscMarks" min="0" max="1100" step="1" required>
+                    <div class="error" id="fscMarks-error">Please enter valid FSC/HSSC marks (0-1100)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fscBoard" class="required">FSC/HSSC Board</label>
+                    <select id="fscBoard" name="fscBoard" required>
+                        <option value="">Select Board</option>
+                        <option value="fbise">FBISE</option>
+                        <option value="bbise">BBISE</option>
+                        <option value="lbise">LBISE</option>
+                        <option value="kbise">KBISE</option>
+                        <option value="pbise">PBISE</option>
+                        <option value="sbise">SBISE</option>
+                        <option value="abise">ABISE</option>
+                        <option value="gbise">GBISE</option>
+                    </select>
+                    <div class="error" id="fscBoard-error">Please select FSC/HSSC board</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="matricRollNo" class="required">Matric Roll Number</label>
+                    <input type="text" id="matricRollNo" name="matricRollNo" required>
+                    <div class="error" id="matricRollNo-error">Please enter your matric roll number</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="interRollNo" class="required">Intermediate Roll Number</label>
+                    <input type="text" id="interRollNo" name="interRollNo" required>
+                    <div class="error" id="interRollNo-error">Please enter your intermediate roll number</div>
+                </div>
+                
+                <div class="btn-container">
+                    <button type="button" class="btn btn-prev" id="prev2">Previous</button>
+                    <button type="button" class="btn btn-next" id="next2">Next</button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Program Choice -->
+            <div class="form-step" id="step3">
+                <div class="form-group">
+                    <label for="program1" class="required">First Choice Program</label>
+                    <select id="program1" name="program1" required>
+                        <option value="">Select Program</option>
+                        <option value="bs-cs">BS Computer Science</option>
+                        <option value="bs-se">BS Software Engineering</option>
+                        <option value="bs-it">BS Information Technology</option>
+                        <option value="bs-ai">BS Artificial Intelligence</option>
+                        <option value="bs-ds">BS Data Science</option>
+                        <option value="bs-ce">BS Computer Engineering</option>
+                        <option value="bs-ee">BS Electrical Engineering</option>
+                    </select>
+                    <div class="error" id="program1-error">Please select your first choice program</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="program2">Second Choice Program (Optional)</label>
+                    <select id="program2" name="program2">
+                        <option value="">Select Program</option>
+                        <option value="bs-cs">BS Computer Science</option>
+                        <option value="bs-se">BS Software Engineering</option>
+                        <option value="bs-it">BS Information Technology</option>
+                        <option value="bs-ai">BS Artificial Intelligence</option>
+                        <option value="bs-ds">BS Data Science</option>
+                        <option value="bs-ce">BS Computer Engineering</option>
+                        <option value="bs-ee">BS Electrical Engineering</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="program3">Third Choice Program (Optional)</label>
+                    <select id="program3" name="program3">
+                        <option value="">Select Program</option>
+                        <option value="bs-cs">BS Computer Science</option>
+                        <option value="bs-se">BS Software Engineering</option>
+                        <option value="bs-it">BS Information Technology</option>
+                        <option value="bs-ai">BS Artificial Intelligence</option>
+                        <option value="bs-ds">BS Data Science</option>
+                        <option value="bs-ce">BS Computer Engineering</option>
+                        <option value="bs-ee">BS Electrical Engineering</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="testCenter" class="required">Preferred Test Center</label>
+                    <select id="testCenter" name="testCenter" required>
+                        <option value="">Select Test Center</option>
+                        <option value="islamabad">Islamabad</option>
+                        <option value="karachi">Karachi</option>
+                        <option value="lahore">Lahore</option>
+                        <option value="peshawar">Peshawar</option>
+                        <option value="quetta">Quetta</option>
+                        <option value="faisalabad">Faisalabad</option>
+                        <option value="multan">Multan</option>
+                    </select>
+                    <div class="error" id="testCenter-error">Please select your preferred test center</div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                    <label for="agreeTerms" class="required">I agree to the terms and conditions</label>
+                    <div class="error" id="agreeTerms-error">You must agree to the terms and conditions</div>
+                </div>
+                
+                <div class="btn-container">
+                    <button type="button" class="btn btn-prev" id="prev3">Previous</button>
+                    <button type="submit" class="btn btn-next">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Populate year dropdowns
+            const currentYear = new Date().getFullYear();
+            const sscYear = document.getElementById('sscYear');
+            const fscYear = document.getElementById('fscYear');
+            
+            for (let year = currentYear; year >= currentYear - 20; year--) {
+                const option1 = document.createElement('option');
+                option1.value = year;
+                option1.textContent = year;
+                sscYear.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = year;
+                option2.textContent = year;
+                fscYear.appendChild(option2);
+            }
+            
+            // Form navigation
+            const steps = document.querySelectorAll('.form-step');
+            const next1 = document.getElementById('next1');
+            const next2 = document.getElementById('next2');
+            const prev2 = document.getElementById('prev2');
+            const prev3 = document.getElementById('prev3');
+            let currentStep = 0;
+            
+            // Set max date for DOB (minimum age 16 years)
+            const dobInput = document.getElementById('dob');
+            const maxDobDate = new Date();
+            maxDobDate.setFullYear(maxDobDate.getFullYear() - 16);
+            dobInput.max = maxDobDate.toISOString().split('T')[0];
+            
+            // Set min date for DOB (maximum age 30 years)
+            const minDobDate = new Date();
+            minDobDate.setFullYear(minDobDate.getFullYear() - 30);
+            dobInput.min = minDobDate.toISOString().split('T')[0];
+            
+            // Validate step 1 before proceeding
+            next1.addEventListener('click', function() {
+                if (validateStep(0)) {
+                    goToStep(1);
+                }
+            });
+            
+            // Validate step 2 before proceeding
+            next2.addEventListener('click', function() {
+                if (validateStep(1)) {
+                    goToStep(2);
+                }
+            });
+            
+            // Previous buttons
+            prev2.addEventListener('click', function() {
+                goToStep(0);
+            });
+            
+            prev3.addEventListener('click', function() {
+                goToStep(1);
+            });
+            
+            // Form submission
+            document.getElementById('registrationForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (validateStep(2)) {
+                    // Form is valid, submit data
+                    alert('Registration submitted successfully!');
+                    // Here you would typically send data to server
+                    console.log('Form data:', getFormData());
+                }
+            });
+            
+            // Function to navigate between steps
+            function goToStep(step) {
+                steps[currentStep].classList.remove('active');
+                document.getElementById(`step${currentStep + 1}-indicator`).classList.remove('active');
+                
+                currentStep = step;
+                
+                steps[currentStep].classList.add('active');
+                document.getElementById(`step${currentStep + 1}-indicator`).classList.add('active');
+                
+                // Mark previous steps as completed
+                for (let i = 0; i < currentStep; i++) {
+                    document.getElementById(`step${i + 1}-indicator`).classList.add('completed');
+                }
+                
+                // Remove completed from current and next steps
+                for (let i = currentStep; i < steps.length; i++) {
+                    document.getElementById(`step${i + 1}-indicator`).classList.remove('completed');
+                }
+            }
+            
+            // Function to validate current step
+            function validateStep(step) {
+                let isValid = true;
+                
+                if (step === 0) {
+                    // Validate personal info
+                    const firstName = document.getElementById('firstName');
+                    const lastName = document.getElementById('lastName');
+                    const fatherName = document.getElementById('fatherName');
+                    const cnic = document.getElementById('cnic');
+                    const dob = document.getElementById('dob');
+                    const gender = document.getElementById('gender');
+                    const email = document.getElementById('email');
+                    const phone = document.getElementById('phone');
+                    const address = document.getElementById('address');
+                    
+                    // Check each field and show errors if invalid
+                    if (!firstName.value.match(/^[A-Za-z ]+$/)) {
+                        showError(firstName, 'firstName-error');
+                        isValid = false;
+                    } else {
+                        hideError(firstName, 'firstName-error');
+                    }
+                    
+                    if (!lastName.value.match(/^[A-Za-z ]+$/)) {
+                        showError(lastName, 'lastName-error');
+                        isValid = false;
+                    } else {
+                        hideError(lastName, 'lastName-error');
+                    }
+                    
+                    if (!fatherName.value.match(/^[A-Za-z ]+$/)) {
+                        showError(fatherName, 'fatherName-error');
+                        isValid = false;
+                    } else {
+                        hideError(fatherName, 'fatherName-error');
+                    }
+                    
+                    if (!cnic.value.match(/^[0-9]{13}$/)) {
+                        showError(cnic, 'cnic-error');
+                        isValid = false;
+                    } else {
+                        hideError(cnic, 'cnic-error');
+                    }
+                    
+                    if (!dob.value) {
+                        showError(dob, 'dob-error');
+                        isValid = false;
+                    } else {
+                        hideError(dob, 'dob-error');
+                    }
+                    
+                    if (!gender.value) {
+                        showError(gender, 'gender-error');
+                        isValid = false;
+                    } else {
+                        hideError(gender, 'gender-error');
+                    }
+                    
+                    if (!email.value || !email.checkValidity()) {
+                        showError(email, 'email-error');
+                        isValid = false;
+                    } else {
+                        hideError(email, 'email-error');
+                    }
+                    
+                    if (!phone.value.match(/^[0-9]{11}$/)) {
+                        showError(phone, 'phone-error');
+                        isValid = false;
+                    } else {
+                        hideError(phone, 'phone-error');
+                    }
+                    
+                    if (!address.value) {
+                        showError(address, 'address-error');
+                        isValid = false;
+                    } else {
+                        hideError(address, 'address-error');
+                    }
+                }
+                else if (step === 1) {
+                    // Validate academic info
+                    const sscYear = document.getElementById('sscYear');
+                    const sscMarks = document.getElementById('sscMarks');
+                    const sscBoard = document.getElementById('sscBoard');
+                    const fscYear = document.getElementById('fscYear');
+                    const fscMarks = document.getElementById('fscMarks');
+                    const fscBoard = document.getElementById('fscBoard');
+                    const matricRollNo = document.getElementById('matricRollNo');
+                    const interRollNo = document.getElementById('interRollNo');
+                    
+                    if (!sscYear.value) {
+                        showError(sscYear, 'sscYear-error');
+                        isValid = false;
+                    } else {
+                        hideError(sscYear, 'sscYear-error');
+                    }
+                    
+                    if (!sscMarks.value || sscMarks.value < 0 || sscMarks.value > 1050) {
+                        showError(sscMarks, 'sscMarks-error');
+                        isValid = false;
+                    } else {
+                        hideError(sscMarks, 'sscMarks-error');
+                    }
+                    
+                    if (!sscBoard.value) {
+                        showError(sscBoard, 'sscBoard-error');
+                        isValid = false;
+                    } else {
+                        hideError(sscBoard, 'sscBoard-error');
+                    }
+                    
+                    if (!fscYear.value) {
+                        showError(fscYear, 'fscYear-error');
+                        isValid = false;
+                    } else {
+                        hideError(fscYear, 'fscYear-error');
+                    }
+                    
+                    if (!fscMarks.value || fscMarks.value < 0 || fscMarks.value > 1100) {
+                        showError(fscMarks, 'fscMarks-error');
+                        isValid = false;
+                    } else {
+                        hideError(fscMarks, 'fscMarks-error');
+                    }
+                    
+                    if (!fscBoard.value) {
+                        showError(fscBoard, 'fscBoard-error');
+                        isValid = false;
+                    } else {
+                        hideError(fscBoard, 'fscBoard-error');
+                    }
+                    
+                    if (!matricRollNo.value) {
+                        showError(matricRollNo, 'matricRollNo-error');
+                        isValid = false;
+                    } else {
+                        hideError(matricRollNo, 'matricRollNo-error');
+                    }
+                    
+                    if (!interRollNo.value) {
+                        showError(interRollNo, 'interRollNo-error');
+                        isValid = false;
+                    } else {
+                        hideError(interRollNo, 'interRollNo-error');
+                    }
+                }
+                else if (step === 2) {
+                    // Validate program choice
+                    const program1 = document.getElementById('program1');
+                    const testCenter = document.getElementById('testCenter');
+                    const agreeTerms = document.getElementById('agreeTerms');
+                    
+                    if (!program1.value) {
+                        showError(program1, 'program1-error');
+                        isValid = false;
+                    } else {
+                        hideError(program1, 'program1-error');
+                    }
+                    
+                    if (!testCenter.value) {
+                        showError(testCenter, 'testCenter-error');
+                        isValid = false;
+                    } else {
+                        hideError(testCenter, 'testCenter-error');
+                    }
+                    
+                    if (!agreeTerms.checked) {
+                        showError(agreeTerms, 'agreeTerms-error');
+                        isValid = false;
+                    } else {
+                        hideError(agreeTerms, 'agreeTerms-error');
+                    }
+                }
+                
+                return isValid;
+            }
+            
+            // Helper function to show error
+            function showError(inputElement, errorId) {
+                inputElement.classList.add('invalid');
+                document.getElementById(errorId).style.display = 'block';
+            }
+            
+            // Helper function to hide error
+            function hideError(inputElement, errorId) {
+                inputElement.classList.remove('invalid');
+                document.getElementById(errorId).style.display = 'none';
+            }
+            
+            // Function to get all form data
+            function getFormData() {
+                return {
+                    personalInfo: {
+                        firstName: document.getElementById('firstName').value,
+                        lastName: document.getElementById('lastName').value,
+                        fatherName: document.getElementById('fatherName').value,
+                        cnic: document.getElementById('cnic').value,
+                        dob: document.getElementById('dob').value,
+                        gender: document.getElementById('gender').value,
+                        email: document.getElementById('email').value,
+                        phone: document.getElementById('phone').value,
+                        address: document.getElementById('address').value
+                    },
+                    academicInfo: {
+                        sscYear: document.getElementById('sscYear').value,
+                        sscMarks: document.getElementById('sscMarks').value,
+                        sscBoard: document.getElementById('sscBoard').value,
+                        fscYear: document.getElementById('fscYear').value,
+                        fscMarks: document.getElementById('fscMarks').value,
+                        fscBoard: document.getElementById('fscBoard').value,
+                        matricRollNo: document.getElementById('matricRollNo').value,
+                        interRollNo: document.getElementById('interRollNo').value
+                    },
+                    programChoice: {
+                        program1: document.getElementById('program1').value,
+                        program2: document.getElementById('program2').value,
+                        program3: document.getElementById('program3').value,
+                        testCenter: document.getElementById('testCenter').value,
+                        agreeTerms: document.getElementById('agreeTerms').checked
+                    }
+                };
+            }
+        });
+    </script>
+</body>
+</html>
